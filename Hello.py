@@ -24,17 +24,20 @@ genai.configure(api_key="AIzaSyDFFDSsV8H2hncAlNiRxxu7auqxsBIsDy0")
 model = genai.GenerativeModel('gemini-pro')
 ms = st.session_state
 
-APIKeys = {"APIKey1": "1d02052b51msh6dee74f2642bb67p1ab876jsn345ba5f417d8", "APIKey2": "c6b2556f55msh39fc0fd1df0801ep14bfd8jsnd987d64b7277", "APIKey3": "6442f2a758mshb645a6362702efcp1cb3fajsn40ce767cb6d5", "APIKey4": "4a10d4e4d5mshfbd8cd7450cc2c7p1e7032jsndbfb762af901"}
-chat = None
+coef_thaibhat_to_singapore = 27.14
+APIKeys = {"APIKey1": "c6b2556f55msh39fc0fd1df0801ep14bfd8jsnd987d64b7277", "APIKey2": "6442f2a758mshb645a6362702efcp1cb3fajsn40ce767cb6d5", "APIKey3": "4a10d4e4d5mshfbd8cd7450cc2c7p1e7032jsndbfb762af901"}
+chat2 = None
 responded = False
-greeting_message = 'Your Thailand Trip Planner Powered by AI. Simplify your travels across Thailand with personalized itineraries crafted just for you. Discover the best of Thailand effortlessly with Next Thai.'
+greeting_message = "Let Eco Mart know what you're looking for, and we'll guide you to eco-friendly options that align with your values, making conscious shopping choices easier than ever."
 
 if 'AIModel' not in ms:
-    chat = model.start_chat(history=[])
-    chat.send_message("nyello")
-    ms['AIModel'] = chat
+    chat2 = model.start_chat(history=[])
+    chat2.send_message("nyello")
+    ms['AIModel'] = chat2
 else:
-    chat = ms['AIModel']
+    chat2 = ms['AIModel']
+
+chat = chat2
 
 if 'replyText' not in ms:
     ms['replyText'] = greeting_message
@@ -58,11 +61,11 @@ def run():
         page_icon="👋",
         layout="wide"
     )
+    st.image('image.png')
+    st.markdown("# Find Your Products Here!")
+    st.subheader("Your Eco-Friendly Shopping Advisor.")
 
-    st.markdown("# Customize Your Journey Here!")
-    st.subheader("Your Dream Trip with Next Thai.")
-
-    st.sidebar.header("Customize Your Journey Here!")
+    st.sidebar.header("Find Your Products Here!")
     
     APIKey = APIKeys[st.sidebar.selectbox(
     'API Key for RapidAPI',
@@ -78,10 +81,11 @@ def run():
 
     store = "Amazon"
 
-    additionalInfo = st.sidebar.text_input('Additional Product Info', 'Suggest for Campers')
+    additionalInfo = st.sidebar.text_input('Additional Product Info', 'Suggest for Students')
   
     if st.sidebar.button('Suggest Eco Friendly Products'):
         with st.spinner('Fetching ESG Compliant Products...'):
+            chat = chat2
             findProducts(APIKey, searchItem, price, store, additionalInfo)
     else:
         pass
@@ -90,7 +94,7 @@ def run():
 def esg_module(data, additionalInfo, searchItem):
     global chat, replyText
     response = chat.send_message("What are the traits that require "+searchItem+" to be eco-friendly?")
-    reply("From the data in the json list: "+data+" choose 5 that from the names help with eco-friendliness, the 'Reason for Eco Friendliness' and the 'Rating'. Include the 'URL for Product Image' first which will have a ! at the front and put the link in the brackets, example: '![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)', and 'Product Name' as well as the 'Link to Product'. Prioritize items that fulfil the requirement:"+additionalInfo+". Write this as you would write down a markdown code for html table with the image at the first element and their sizes around 150px and a put each element into separate lines. so the order will be in header 'Product Image', 'name','reasons','rating','link'")
+    reply("Read through the data in the json list: "+data+" choose 5 from the names that is most appropriate with eco-friendliness,'Reason for Eco Friendliness' (make sure it is detailed) and the 'Rating' and the 'Price'. Include the 'URL for Product Image' first which will have a ! at the front and put the link in the brackets, example: '![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)', and 'Product Name' as well as the 'Link to Product' and 'Price' in thai bhat. Write this as you would write down a markdown code for html table with the image at the first element and their sizes around 150px and a put each element into separate lines. so the order will be in header 'Product Image', 'name','reasons','rating','link'. If there are no products then just reply with an appropriate message. At the end of the text add an additional separate paragraph that explains why you recommend these products according to  esg principles. provide explaination  that fulfil the requirement:"+additionalInfo+". Add things to consider when buying these sorts of products.")
     return
 
 def reply(prompt):
@@ -103,50 +107,13 @@ def list_to_string(lst, delimiter=', '):
 
 def findProducts(APIKey, searchItem, price, store, additionalInfo):
     
-    global responded, replyText
+    global responded, replyText, chat
     
     responded = True
 
+    price = price/coef_thaibhat_to_singapore
+
     prompt = ""
-    
-    if store == "Shopee" or store == "All":
-      #Shoppe
-      conn = http.client.HTTPSConnection("shopee-e-commerce-data.p.rapidapi.com")
-
-      headers = {
-          'X-RapidAPI-Key': APIKey,
-          'X-RapidAPI-Host': "shopee-e-commerce-data.p.rapidapi.com"
-      }
-      priceText = ""
-      if price != 0:
-        priceText = "&price_end="+str(price)
-
-      conn.request("GET", "/shopee/search/items/v2?site=th&keyword="+str(searchItem)+"&page=1&pageSize=1"+str(priceText), headers=headers)
-
-      res = conn.getresponse()
-      data = res.read()
-
-      prompt += "\nShopee: "
-      prompt += str(data.decode("utf-8"))
-
-    if store == "Lazada" or store == "All":
-    #Lazada
-      conn = http.client.HTTPSConnection("lazada-api.p.rapidapi.com")
-
-      headers = {
-          'X-RapidAPI-Key': "1d02052b51msh6dee74f2642bb67p1ab876jsn345ba5f417d8",
-          'X-RapidAPI-Host': "lazada-api.p.rapidapi.com"
-      }
-      priceText = ""
-      if price != 0:
-        priceText = "&endPrice="+str(price)
-
-      conn.request("GET", "/lazada/search/items?keywords="+str(searchItem)+"&site=th&page=1&sort=sales"+str(priceText), headers=headers)
-
-      res = conn.getresponse()
-      data = res.read()
-      prompt += "\nLazada: "
-      prompt += str(data.decode("utf-8"))
 
     if store == "Amazon" or store == "All":
     #Amazon
