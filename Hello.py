@@ -69,11 +69,11 @@ def run():
     
     APIKey = APIKeys[st.sidebar.selectbox(
     'API Key for RapidAPI',
-    ("APIKey1", "APIKey2", "APIKey3", "APIKey4"))]
+    ("APIKey1", "APIKey2", "APIKey3"))]
 
     searchItem = st.sidebar.text_input('Search Item', 'Lamp')
 
-    price = st.sidebar.number_input('Maximum Price in Bhat', min_value = 0, value = 0, step = 50)
+    price = st.sidebar.number_input('Maximum Price in Bhat', min_value = 0, value = 0, step = 100)
 
     #store = st.sidebar.selectbox(
     #'Online Shops',
