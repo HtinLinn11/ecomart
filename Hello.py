@@ -58,10 +58,10 @@ def run():
 
     st.set_page_config(
         page_title="Eco Mart",
-        page_icon="👋",
+        page_icon="🍃",
         layout="wide"
     )
-    st.image('image.png')
+    st.image('image.png', width = 100)
     st.markdown("# Find Your Products Here!")
     st.subheader("Your Eco-Friendly Shopping Advisor.")
 
