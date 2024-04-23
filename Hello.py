@@ -30,12 +30,9 @@ chat2 = None
 responded = False
 greeting_message = "Let Eco Mart know what you're looking for, and we'll guide you to eco-friendly options that align with your values, making conscious shopping choices easier than ever."
 
-if 'AIModel' not in ms:
-    chat2 = model.start_chat(history=[])
-    chat2.send_message("nyello")
-    ms['AIModel'] = chat2
-else:
-    chat2 = ms['AIModel']
+chat2 = model.start_chat(history=[])
+chat2.send_message("You are an AI Model that suggests users eco friendly products from a given json list.")
+ms['AIModel'] = chat2
 
 chat = chat2
 
