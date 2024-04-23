@@ -73,7 +73,7 @@ def run():
 
     searchItem = st.sidebar.text_input('Search Item', 'Lamp')
 
-    price = st.sidebar.number_input('Maximum Price in Bhat', min_value = 0, value = 0, step = 100)
+    price = st.sidebar.number_input('Maximum Price in Bhat', min_value = 0, value = 0, step = 200)
 
     #store = st.sidebar.selectbox(
     #'Online Shops',
